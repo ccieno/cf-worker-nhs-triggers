@@ -25,19 +25,6 @@ This is used during NHS demos to simulate a real-world outage scenario mid-call,
 
 Authentication tokens are cached in the worker's memory for their full lifetime to avoid unnecessary re-authentication on each request.
 
-## Secrets required
-
-Set via `wrangler secret put` or the Cloudflare dashboard:
-
-| Secret | Description |
-|---|---|
-| `ZOOM_ACCOUNT_ID` | Zoom account ID |
-| `ZOOM_CLIENT_ID` | Server-to-Server OAuth app client ID |
-| `ZOOM_CLIENT_SECRET` | Server-to-Server OAuth app client secret |
-| `ZOOM_MSO_VARIABLE_ID` | ZCC variable ID for `nhs.mso` |
-| `ZOOM_PROVIDER_VARIABLE_ID` | ZCC variable ID for `nhs.provider` |
-
-Find variable IDs in **ZCC Admin → Contact Centre → Variables**.
 
 ## Development & deployment
 
