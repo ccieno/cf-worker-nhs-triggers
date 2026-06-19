@@ -1,32 +1,50 @@
-# nhs-triggers — NHS MSO Control Worker
+# nhs-triggers — NHS MSO API Worker
 
-A Cloudflare Worker that provides a simple toggle UI for controlling NHS Major Service Outage (MSO) status in a Zoom Contact Centre demo environment.
+A Cloudflare Worker providing a JSON API to read and control NHS Major Service Outage (MSO) status in a Zoom Contact Centre demo environment. The browser UI is served from `app.eno.solutions/nhs`.
 
-**Deployed at:** `api.eno.solutions/nhs`
+**Deployed at:** `api.eno.solutions/nhs/*`
 
-## What it does
+## Routes
 
-Serves a browser-based toggle page that lets you flip two ZCC global variables without needing ZCC admin access:
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/nhs/status` | Returns current MSO and provider values as JSON |
+| `POST` | `/nhs/update` | Updates `mso` or `provider` variable in ZCC |
+| `OPTIONS` | `*` | CORS preflight |
 
-| Variable | Description |
+CORS is locked to `https://app.eno.solutions`.
+
+## Variables
+
+| Variable | ZCC Variable | Description |
+|---|---|---|
+| `mso` | `nhs.mso` | Major Service Outage flag — `"true"` routes callers to emergency handling |
+| `provider` | `nhs.provider` | Affected provider name (Microsoft365, Global Protect, 8x8, Oracle, Rio, SystemOne) |
+
+## POST /nhs/update payload
+
+```json
+{ "variable": "mso", "value": "true" }
+{ "variable": "provider", "value": "Oracle" }
+```
+
+## Architecture
+
+- No browser UI in this worker — UI lives at `app.eno.solutions/nhs`
+- Server-to-Server OAuth with in-memory token caching
+- All responses are JSON with CORS headers
+
+## Secrets required
+
+| Secret | Description |
 |---|---|
-| `nhs.mso` | Major Service Outage flag — routes callers to emergency handling when `true` |
-| `nhs.provider` | Provider type — controls which flow branch handles the call |
+| `ZOOM_ACCOUNT_ID` | Zoom account ID |
+| `ZOOM_CLIENT_ID` | Server-to-Server OAuth app client ID |
+| `ZOOM_CLIENT_SECRET` | Server-to-Server OAuth app client secret |
+| `ZOOM_MSO_VARIABLE_ID` | Variable ID for `nhs.mso` (ZCC Admin → Variables) |
+| `ZOOM_PROVIDER_VARIABLE_ID` | Variable ID for `nhs.provider` |
 
-This is used during NHS demos to simulate a real-world outage scenario mid-call, showing how ZCC can dynamically change routing behaviour in real time.
-
-## How it works
-
-1. The worker serves an HTML page with toggle controls at `GET /nhs`
-2. When a toggle is flipped, the page posts to `POST /nhs/update`
-3. The worker authenticates to Zoom using Server-to-Server OAuth (credentials cached in memory)
-4. It calls the ZCC Variables API (`/v2/contact_center/variables/:id`) to patch the variable value
-5. The UI reflects the updated state
-
-Authentication tokens are cached in the worker's memory for their full lifetime to avoid unnecessary re-authentication on each request.
-
-
-## Development & deployment
+## Development
 
 ```bash
 wrangler dev       # local dev server
