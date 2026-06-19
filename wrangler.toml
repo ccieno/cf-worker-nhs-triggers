@@ -2,11 +2,12 @@ name               = "nhs-triggers"
 main               = "index.js"
 compatibility_date = "2024-01-01"
 
-# ── Custom domain route ──────────────────────────────────────────────────────
-# Serves the worker at https://api.eno.solutions/nhs (and /nhs/update)
-# The zone_name must match the domain you have in your Cloudflare account.
+# ── Custom domain routes ─────────────────────────────────────────────────────
+# Only handle the two API paths — GET /nhs falls through to the app worker
+# which serves the HTML page. More specific patterns beat app.eno.solutions/*.
 routes = [
-  { pattern = "api.eno.solutions/nhs*", zone_name = "eno.solutions" }
+  { pattern = "app.eno.solutions/nhs/status", zone_name = "eno.solutions" },
+  { pattern = "app.eno.solutions/nhs/update", zone_name = "eno.solutions" }
 ]
 
 # ── Environment variables ────────────────────────────────────────────────────

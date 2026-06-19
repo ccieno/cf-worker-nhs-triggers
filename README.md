@@ -2,7 +2,7 @@
 
 A Cloudflare Worker providing a JSON API to read and control NHS Major Service Outage (MSO) status in a Zoom Contact Centre demo environment. The browser UI is served from `app.eno.solutions/nhs`.
 
-**Deployed at:** `api.eno.solutions/nhs/*`
+**Deployed at:** `app.eno.solutions/nhs/*`
 
 ## Routes
 
